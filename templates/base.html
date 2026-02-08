@@ -4,76 +4,511 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Secure Digital Wallet{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
-        .nav { display: flex; gap: 15px; }
-        .nav a { text-decoration: none; color: #007bff; padding: 5px 10px; border-radius: 4px; }
-        .nav a:hover { background: #007bff; color: white; }
-        .flash-messages { margin: 10px 0; }
-        .flash-success { color: #28a745; background: #d4edda; padding: 10px; border-radius: 4px; }
-        .flash-error { color: #dc3545; background: #f8d7da; padding: 10px; border-radius: 4px; }
-        .flash-info { color: #17a2b8; background: #d1ecf1; padding: 10px; border-radius: 4px; }
-        form { display: flex; flex-direction: column; gap: 15px; }
-        input[type="text"], input[type="password"], input[type="number"], textarea { 
-            padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; 
-            width: 100%; min-height: 100px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        button:hover { background: #0056b3; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background: #f8f9fa; }
-        .certificate-box, .master-key-box { 
-            background: #f8f9fa; 
-            padding: 15px; 
-            border-radius: 4px; 
-            font-family: monospace; 
-            font-size: 12px;
-            max-height: 200px;
+        
+        :root {
+            --primary: #0A2540;
+            --primary-light: #1A3F5F;
+            --accent: #00D4FF;
+            --accent-dark: #00A8CC;
+            --success: #10B981;
+            --success-bg: #D1FAE5;
+            --error: #EF4444;
+            --error-bg: #FEE2E2;
+            --warning: #F59E0B;
+            --warning-bg: #FEF3C7;
+            --info: #3B82F6;
+            --info-bg: #DBEAFE;
+            --text: #1F2937;
+            --text-light: #6B7280;
+            --bg: #F9FAFB;
+            --surface: #FFFFFF;
+            --border: #E5E7EB;
+            --shadow: rgba(0, 0, 0, 0.05);
+            --shadow-md: rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0A2540 0%, #1A3F5F 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(0, 212, 255, 0.1) 100%);
+            pointer-events: none;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .nav a {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .nav a:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .secondary-nav {
+            padding: 1rem 2.5rem;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .secondary-nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+        }
+        
+        .secondary-nav a:hover {
+            color: var(--primary);
+        }
+        
+        .content {
+            padding: 2.5rem;
+        }
+        
+        .flash-messages {
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .flash-success,
+        .flash-error,
+        .flash-info,
+        .flash-warning {
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-left: 4px solid;
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .flash-success {
+            background: var(--success-bg);
+            color: #065F46;
+            border-color: var(--success);
+        }
+        
+        .flash-error {
+            background: var(--error-bg);
+            color: #991B1B;
+            border-color: var(--error);
+        }
+        
+        .flash-info {
+            background: var(--info-bg);
+            color: #1E40AF;
+            border-color: var(--info);
+        }
+        
+        .flash-warning {
+            background: var(--warning-bg);
+            color: #92400E;
+            border-color: var(--warning);
+        }
+        
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        label {
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            display: block;
+            font-size: 0.9rem;
+        }
+        
+        input[type="text"],
+        input[type="password"],
+        input[type="number"],
+        textarea {
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            width: 100%;
+            transition: all 0.2s ease;
+            background: var(--surface);
+        }
+        
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+        
+        textarea {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            min-height: 140px;
+            resize: vertical;
+        }
+        
+        button,
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            display: inline-block;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        button:hover,
+        .btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-md);
+        }
+        
+        button:active,
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-success {
+            background: var(--success);
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-accent {
+            background: var(--accent);
+            color: var(--primary);
+        }
+        
+        .btn-accent:hover {
+            background: var(--accent-dark);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 1.5rem;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        
+        th {
+            background: var(--bg);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+        }
+        
+        td {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.95rem;
+        }
+        
+        tr:hover td {
+            background: var(--bg);
+        }
+        
+        .certificate-box,
+        .master-key-box {
+            background: var(--primary);
+            color: var(--accent);
+            padding: 1.5rem;
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            max-height: 250px;
             overflow: auto;
             word-break: break-all;
+            line-height: 1.6;
+            border: 2px solid var(--primary-light);
         }
-        .warning { 
-            background: #fff3cd; 
-            border: 1px solid #ffeaa7; 
-            color: #856404; 
-            padding: 10px; 
-            border-radius: 4px; 
-            margin: 10px 0;
+        
+        .certificate-box::-webkit-scrollbar,
+        .master-key-box::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .certificate-box::-webkit-scrollbar-track,
+        .master-key-box::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        
+        .certificate-box::-webkit-scrollbar-thumb,
+        .master-key-box::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+        
+        .warning {
+            background: var(--warning-bg);
+            border-left: 4px solid var(--warning);
+            color: #92400E;
+            padding: 1.25rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+        
+        .warning strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+        
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 1.5rem 0 1rem;
+        }
+        
+        p {
+            color: var(--text-light);
+            margin: 0.75rem 0;
+        }
+        
+        a {
+            color: var(--accent-dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        
+        a:hover {
+            color: var(--primary);
+        }
+        
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--primary);
+        }
+        
+        ol, ul {
+            padding-left: 1.5rem;
+            color: var(--text-light);
+        }
+        
+        li {
+            margin: 0.5rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+            
+            .container {
+                border-radius: 12px;
+            }
+            
+            .header {
+                padding: 1.5rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            h1 {
+                font-size: 1.25rem;
+            }
+            
+            .content {
+                padding: 1.5rem;
+            }
+            
+            .nav {
+                width: 100%;
+            }
+            
+            .nav a {
+                flex: 1;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Secure Digital Wallet</h1>
-            {% if session.user_id %}
-            <div class="nav">
-                <a href="{{ url_for('dashboard') }}">Dashboard</a>
-                <a href="{{ url_for('fund') }}">Add Funds</a>
-                <a href="{{ url_for('transfer') }}">Transfer</a>
-                <a href="{{ url_for('logout') }}">Logout</a>
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🔐</div>
+                    <h1>Secure Digital Wallet</h1>
+                </div>
+                {% if session.user_id %}
+                <nav class="nav">
+                    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+                    <a href="{{ url_for('fund') }}">Add Funds</a>
+                    <a href="{{ url_for('transfer') }}">Transfer</a>
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                </nav>
+                {% endif %}
             </div>
-            {% endif %}
         </div>
         
-        <div class="nav">
+        {% if not session.user_id %}
+        <div class="secondary-nav">
             <a href="{{ url_for('password_reset') }}">Forgot Password?</a>
-        </div>      
+        </div>
+        {% endif %}
         
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="flash-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-        
-        {% block content %}{% endblock %}
+        <div class="content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            {% block content %}{% endblock %}
+        </div>
     </div>
 </body>
 </html>

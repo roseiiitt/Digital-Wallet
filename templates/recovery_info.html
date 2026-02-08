@@ -1,34 +1,301 @@
 {% extends "base.html" %}
 {% block title %}Recovery Information - Secure Digital Wallet{% endblock %}
 {% block content %}
-<h2>⚠️ CRITICAL: Save Your Recovery Information!</h2>
+<style>
+    .recovery-info-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    
+    .critical-header {
+        background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 2rem;
+        border: 3px solid var(--error);
+    }
+    
+    .critical-header h2 {
+        color: #991B1B;
+        margin-bottom: 0.5rem;
+        font-size: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+    
+    .critical-header p {
+        color: #7F1D1D;
+        font-size: 1rem;
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    .credentials-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .credential-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 2px solid var(--border);
+    }
+    
+    .credential-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .credential-header h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: white;
+    }
+    
+    .credential-icon {
+        font-size: 1.5rem;
+    }
+    
+    .credential-body {
+        padding: 1.5rem;
+    }
+    
+    .master-key-display {
+        background: var(--primary);
+        color: var(--accent);
+        padding: 1.5rem;
+        border-radius: 8px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.95rem;
+        word-break: break-all;
+        line-height: 1.8;
+        border: 2px solid var(--primary-light);
+        margin-bottom: 1rem;
+    }
+    
+    .certificate-display {
+        background: var(--primary);
+        color: var(--accent);
+        padding: 1.5rem;
+        border-radius: 8px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        max-height: 250px;
+        overflow: auto;
+        word-break: break-all;
+        line-height: 1.6;
+        border: 2px solid var(--primary-light);
+        margin-bottom: 1rem;
+    }
+    
+    .certificate-display::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .certificate-display::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+    }
+    
+    .certificate-display::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 4px;
+    }
+    
+    .copy-button {
+        background: var(--bg);
+        color: var(--primary);
+        border: 2px solid var(--border);
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    
+    .copy-button:hover {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: none;
+    }
+    
+    .instructions-section {
+        background: var(--bg);
+        padding: 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+    
+    .instructions-section h3 {
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        font-size: 1.25rem;
+    }
+    
+    .instructions-section ol {
+        padding-left: 1.5rem;
+    }
+    
+    .instructions-section li {
+        margin: 1rem 0;
+        color: var(--text);
+        line-height: 1.7;
+    }
+    
+    .instructions-section strong {
+        color: var(--primary);
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .action-buttons .btn {
+        flex: 1;
+        min-width: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1rem 1.5rem;
+    }
+    
+    .download-btn {
+        background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+    }
+    
+    .download-btn:hover {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    }
+    
+    .continue-btn {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    }
+    
+    .continue-btn:hover {
+        background: linear-gradient(135deg, var(--primary-light) 0%, #0F2D47 100%);
+    }
+    
+    .warning-banner {
+        background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+        border-left: 4px solid var(--warning);
+        padding: 1.5rem;
+        border-radius: 10px;
+        margin-top: 2rem;
+    }
+    
+    .warning-banner-title {
+        font-weight: 600;
+        color: #92400E;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .warning-banner-text {
+        font-size: 0.9rem;
+        color: #78350F;
+        margin: 0;
+        line-height: 1.6;
+    }
+</style>
 
-<div class="warning">
-    <strong>Master Key (For Account Recovery):</strong><br>
-    <div class="master-key-box">{{ master_key }}</div>
+<div class="recovery-info-container">
+    <div class="critical-header">
+        <h2>⚠️ Critical Security Information</h2>
+        <p>Save these credentials immediately - they cannot be recovered later!</p>
+    </div>
+    
+    <div class="credentials-section">
+        <div class="credential-card">
+            <div class="credential-header">
+                <span class="credential-icon">🔑</span>
+                <h3>Master Recovery Key</h3>
+            </div>
+            <div class="credential-body">
+                <div class="master-key-display">{{ master_key }}</div>
+                <button class="copy-button" onclick="navigator.clipboard.writeText('{{ master_key }}').then(() => alert('Master key copied to clipboard!'))">
+                    📋 Copy Master Key
+                </button>
+                <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-light);">
+                    Use this key to recover your account if you lose your certificate. Store it in a secure location - write it down and keep it safe.
+                </p>
+            </div>
+        </div>
+        
+        <div class="credential-card">
+            <div class="credential-header">
+                <span class="credential-icon">🔐</span>
+                <h3>X.509 Authentication Certificate</h3>
+            </div>
+            <div class="credential-body">
+                <div class="certificate-display">{{ certificate_pem }}</div>
+                <button class="copy-button" onclick="navigator.clipboard.writeText(`{{ certificate_pem }}`).then(() => alert('Certificate copied to clipboard!'))">
+                    📋 Copy Certificate
+                </button>
+                <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-light);">
+                    You'll need this certificate for every login and transaction. Download it and keep it in a secure location on your device.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="instructions-section">
+        <h3>🛡️ Critical Security Instructions</h3>
+        <ol>
+            <li>
+                <strong>Save Your Master Key:</strong> Write it down on paper and store it in a secure location (safe, safety deposit box, etc.). This is your last line of defense if you lose your certificate.
+            </li>
+            <li>
+                <strong>Download Your Certificate:</strong> Click the download button below to save your certificate as a .pem file. Store it securely on your device and create a backup.
+            </li>
+            <li>
+                <strong>Never Share These Credentials:</strong> Your Master Key and Certificate provide complete access to your wallet. Never share them with anyone, including support staff.
+            </li>
+            <li>
+                <strong>Create Multiple Backups:</strong> Store copies in different secure locations to prevent loss due to device failure or other incidents.
+            </li>
+            <li>
+                <strong>Recovery Process:</strong> If you lose your certificate, you can use your Master Key through the account recovery process to generate a new one.
+            </li>
+        </ol>
+    </div>
+    
+    <div class="action-buttons">
+        <a href="{{ url_for('download_certificate', user_id=user.id) }}" class="btn download-btn">
+            <span>📥</span>
+            <span>Download Certificate</span>
+        </a>
+        <a href="{{ url_for('login') }}" class="btn continue-btn">
+            <span>Proceed to Login</span>
+            <span>→</span>
+        </a>
+    </div>
+    
+    <div class="warning-banner">
+        <div class="warning-banner-title">
+            <span>⚡</span>
+            <span>This Page Will Not Be Shown Again</span>
+        </div>
+        <p class="warning-banner-text">
+            This is your only opportunity to view and save your Master Key. Once you leave this page, you won't be able to see it again. Make sure you've saved both credentials before continuing.
+        </p>
+    </div>
 </div>
-
-<div class="certificate-box">
-    <strong>Your X.509 Certificate:</strong><br>
-    <pre>{{ certificate_pem }}</pre>
-</div>
-
-<div style="margin: 20px 0;">
-    <h3>Important Security Instructions:</h3>
-    <ol>
-        <li><strong>Save your Master Key immediately</strong> - write it down and store it securely</li>
-        <li><strong>Download your certificate</strong> - you'll need it for every login</li>
-        <li><strong>Never share either</strong> - they provide full access to your wallet</li>
-        <li><strong>If you lose your certificate</strong>, use the Master Key to recover your account</li>
-    </ol>
-</div>
-
-<a href="{{ url_for('download_certificate', user_id=user.id) }}" class="btn" style="display: inline-block; background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-right: 10px;">
-    📥 Download Certificate (.pem)
-</a>
-
-<a href="{{ url_for('login') }}" class="btn" style="display: inline-block; background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
-    → Proceed to Login
-</a>
-
 {% endblock %}

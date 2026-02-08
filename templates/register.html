@@ -1,32 +1,169 @@
 {% extends "base.html" %}
 {% block title %}Register - Secure Digital Wallet{% endblock %}
 {% block content %}
-<h2>Create Account</h2>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div>
-        {{ form.username.label }}<br>
-        {{ form.username(size=32, placeholder="At least 5 characters") }}
-        {% if form.username.errors %}
-            <div class="flash-error">
-                {% for error in form.username.errors %}
-                    {{ error }}
-                {% endfor %}
-            </div>
-        {% endif %}
+<style>
+    .register-container {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h2 {
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-header p {
+        font-size: 1rem;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem;
+        background: var(--bg);
+        border-radius: 10px;
+        border-left: 3px solid var(--accent);
+    }
+    
+    .feature-icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .feature-content h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin: 0 0 0.25rem 0;
+    }
+    
+    .feature-content p {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin: 0;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .password-requirements {
+        background: var(--bg);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .password-requirements ul {
+        margin: 0.5rem 0 0 0;
+        padding-left: 1.5rem;
+    }
+    
+    .password-requirements li {
+        margin: 0.25rem 0;
+        color: var(--text-light);
+    }
+    
+    .footer-links {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+        text-align: center;
+    }
+    
+    .footer-links a {
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+    
+    .footer-links a:hover {
+        color: var(--primary);
+    }
+</style>
+
+<div class="register-container">
+    <div class="page-header">
+        <h2>Create Your Account</h2>
+        <p>Join the most secure digital wallet platform</p>
     </div>
-    <div>
-        {{ form.password.label }}<br>
-        {{ form.password(size=32, placeholder="At least 8 characters") }}
-        {% if form.password.errors %}
-            <div class="flash-error">
-                {% for error in form.password.errors %}
-                    {{ error }}
-                {% endfor %}
+    
+    <div class="features-grid">
+        <div class="feature-item">
+            <div class="feature-icon">🔐</div>
+            <div class="feature-content">
+                <h4>Zero-Trust Security</h4>
+                <p>Certificate-based authentication for maximum protection</p>
             </div>
-        {% endif %}
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-content">
+                <h4>Instant Transfers</h4>
+                <p>Send and receive funds securely in real-time</p>
+            </div>
+        </div>
+        <div class="feature-item">
+            <div class="feature-icon">🛡️</div>
+            <div class="feature-content">
+                <h4>Recovery Options</h4>
+                <p>Master key backup ensures you never lose access</p>
+            </div>
+        </div>
     </div>
-    <button type="submit">Register</button>
-</form>
-<p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+    
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            <label for="username">{{ form.username.label }}</label>
+            {{ form.username(size=32, placeholder="Choose a unique username") }}
+            <div class="helper-text">At least 5 characters, letters and numbers only</div>
+            {% if form.username.errors %}
+                <div class="flash-error" style="margin-top: 0.5rem;">
+                    {% for error in form.username.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="password">{{ form.password.label }}</label>
+            {{ form.password(size=32, placeholder="Create a strong password") }}
+            <div class="password-requirements">
+                <strong>Password Requirements:</strong>
+                <ul>
+                    <li>Minimum 8 characters</li>
+                    <li>Mix of letters, numbers, and symbols recommended</li>
+                </ul>
+            </div>
+            {% if form.password.errors %}
+                <div class="flash-error" style="margin-top: 0.5rem;">
+                    {% for error in form.password.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" style="width: 100%;">Create Account 🚀</button>
+    </form>
+    
+    <div class="footer-links">
+        Already have an account? <a href="{{ url_for('login') }}"><strong>Sign in instead</strong></a>
+    </div>
+</div>
 {% endblock %}

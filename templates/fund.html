@@ -1,19 +1,261 @@
 {% extends "base.html" %}
 {% block title %}Add Funds - Secure Digital Wallet{% endblock %}
 {% block content %}
-<h2>Add Funds via Stripe Sandbox</h2>
-<div class="warning">
-    <strong>Stripe Test Mode:</strong> Use test card <code>4242 4242 4242 4242</code> for payments.<br>
-    This is a sandbox environment - no real money will be charged.
+<style>
+    .fund-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h2 {
+        margin-bottom: 0.5rem;
+    }
+    
+    .stripe-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        background: linear-gradient(135deg, #F0F4FF 0%, #E0E7FF 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #635BFF;
+    }
+    
+    .stripe-notice-icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+    }
+    
+    .stripe-notice-content {
+        flex: 1;
+    }
+    
+    .stripe-notice-title {
+        font-weight: 600;
+        color: #312E81;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+    
+    .stripe-notice-text {
+        font-size: 0.85rem;
+        color: #4C4594;
+        line-height: 1.5;
+        margin: 0 0 0.75rem 0;
+    }
+    
+    .test-card {
+        display: inline-block;
+        font-family: 'JetBrains Mono', monospace;
+        background: white;
+        padding: 0.4rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #635BFF;
+        border: 1px solid #635BFF;
+    }
+    
+    .amount-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .amount-option {
+        background: var(--bg);
+        border: 2px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .amount-option:hover {
+        border-color: #635BFF;
+        background: #F0F4FF;
+        transform: translateY(-2px);
+    }
+    
+    .amount-option.selected {
+        border-color: #635BFF;
+        background: linear-gradient(135deg, #F0F4FF 0%, #E0E7FF 100%);
+    }
+    
+    .amount-option-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.25rem;
+    }
+    
+    .amount-option-label {
+        font-size: 0.75rem;
+        color: var(--text-light);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .custom-amount-section {
+        background: var(--bg);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+    
+    .custom-amount-section h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin: 0 0 1rem 0;
+    }
+    
+    .input-with-icon {
+        position: relative;
+    }
+    
+    .currency-symbol {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-light);
+        pointer-events: none;
+    }
+    
+    .input-with-icon input {
+        padding-left: 2.5rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .helper-text {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin-top: 0.5rem;
+    }
+    
+    .stripe-button {
+        background: linear-gradient(135deg, #635BFF 0%, #5548D9 100%);
+        width: 100%;
+        font-size: 1.1rem;
+        padding: 1rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+    
+    .stripe-button:hover {
+        background: linear-gradient(135deg, #5548D9 0%, #4840C7 100%);
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+        color: var(--text-light);
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    
+    .back-link:hover {
+        color: var(--primary);
+    }
+    
+    .security-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+    }
+    
+    .security-feature {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+    
+    .security-feature-icon {
+        font-size: 1.25rem;
+    }
+</style>
+
+<div class="fund-container">
+    <div class="page-header">
+        <h2>Add Funds</h2>
+        <p>Top up your wallet balance securely with Stripe</p>
+    </div>
+    
+    <div class="stripe-notice">
+        <div class="stripe-notice-icon">💳</div>
+        <div class="stripe-notice-content">
+            <div class="stripe-notice-title">Stripe Test Mode</div>
+            <p class="stripe-notice-text">This is a sandbox environment. Use the test card number below - no real money will be charged.</p>
+            <div class="test-card">4242 4242 4242 4242</div>
+        </div>
+    </div>
+    
+    <div class="custom-amount-section">
+        <h4>Enter Amount</h4>
+        <form method="POST">
+            <div class="input-with-icon">
+                <span class="currency-symbol">$</span>
+                <input type="number" id="amount" name="amount" min="1" step="0.01" required placeholder="0.00">
+            </div>
+            <div class="helper-text">Minimum amount: $1.00 USD</div>
+            
+            <button type="submit" class="stripe-button">
+                <span>Add Funds via Stripe</span>
+                <span>→</span>
+            </button>
+        </form>
+    </div>
+    
+    <div class="security-features">
+        <div class="security-feature">
+            <span class="security-feature-icon">🔒</span>
+            <span>256-bit SSL encryption</span>
+        </div>
+        <div class="security-feature">
+            <span class="security-feature-icon">✓</span>
+            <span>PCI DSS compliant</span>
+        </div>
+        <div class="security-feature">
+            <span class="security-feature-icon">🛡️</span>
+            <span>Fraud protection</span>
+        </div>
+    </div>
+    
+    <a href="{{ url_for('dashboard') }}" class="back-link">
+        ← Back to Dashboard
+    </a>
 </div>
 
-<form method="POST">
-    <div>
-        <label for="amount">Amount (USD):</label><br>
-        <input type="number" id="amount" name="amount" min="1" step="0.01" required placeholder="10.00">
-    </div>
-    <button type="submit" style="background: #635BFF; color: white;">Add Funds via Stripe</button>
-</form>
-
-<a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+<script>
+    // Quick amount selection
+    document.querySelectorAll('.amount-option').forEach(option => {
+        option.addEventListener('click', function() {
+            document.querySelectorAll('.amount-option').forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            const amount = this.querySelector('.amount-option-value').textContent.replace('$', '');
+            document.getElementById('amount').value = amount;
+        });
+    });
+</script>
 {% endblock %}

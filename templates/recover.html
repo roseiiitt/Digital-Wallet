@@ -1,37 +1,231 @@
 {% extends "base.html" %}
 {% block title %}Account Recovery - Secure Digital Wallet{% endblock %}
 {% block content %}
-<h2>Account Recovery</h2>
-<div class="warning">
-    <strong>Use this only if you lost your certificate!</strong><br>
-    You'll need your Master Key to regenerate a new certificate.
-</div>
+<style>
+    .recover-container {
+        max-width: 550px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h2 {
+        margin-bottom: 0.5rem;
+    }
+    
+    .emergency-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border-left: 4px solid var(--error);
+    }
+    
+    .emergency-notice-icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+    }
+    
+    .emergency-notice-content {
+        flex: 1;
+    }
+    
+    .emergency-notice-title {
+        font-weight: 600;
+        color: #991B1B;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+    
+    .emergency-notice-text {
+        font-size: 0.85rem;
+        color: #7F1D1D;
+        line-height: 1.5;
+        margin: 0;
+    }
+    
+    .recovery-steps {
+        background: var(--bg);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+    
+    .recovery-steps h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin: 0 0 1rem 0;
+    }
+    
+    .recovery-steps ol {
+        margin: 0;
+        padding-left: 1.5rem;
+    }
+    
+    .recovery-steps li {
+        margin: 0.75rem 0;
+        color: var(--text-light);
+        line-height: 1.6;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .master-key-input-wrapper {
+        background: var(--primary);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid var(--primary-light);
+    }
+    
+    .master-key-input-wrapper label {
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .master-key-input-wrapper input {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        color: var(--accent);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.95rem;
+    }
+    
+    .master-key-input-wrapper input::placeholder {
+        color: rgba(0, 212, 255, 0.5);
+    }
+    
+    .master-key-input-wrapper input:focus {
+        border-color: var(--accent);
+        background: rgba(255, 255, 255, 0.15);
+    }
+    
+    .helper-text {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 0.5rem;
+    }
+    
+    .recovery-button {
+        background: linear-gradient(135deg, var(--error) 0%, #DC2626 100%);
+        width: 100%;
+    }
+    
+    .recovery-button:hover {
+        background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+        color: var(--text-light);
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    
+    .back-link:hover {
+        color: var(--primary);
+    }
+    
+    .info-box {
+        background: #DBEAFE;
+        border-left: 4px solid var(--info);
+        padding: 1.25rem;
+        border-radius: 10px;
+        margin-top: 2rem;
+    }
+    
+    .info-box-title {
+        font-weight: 600;
+        color: #1E40AF;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .info-box-text {
+        font-size: 0.85rem;
+        color: #1E3A8A;
+        margin: 0;
+    }
+</style>
 
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div>
-        {{ form.username.label }}<br>
-        {{ form.username(size=32, placeholder="Your username") }}
-        {% if form.username.errors %}
-            <div class="flash-error">
-                {% for error in form.username.errors %}
-                    {{ error }}
-                {% endfor %}
-            </div>
-        {% endif %}
+<div class="recover-container">
+    <div class="page-header">
+        <h2>Account Recovery</h2>
+        <p>Regain access to your wallet</p>
     </div>
-    <div>
-        {{ form.master_key.label }}<br>
-        {{ form.master_key(size=32, placeholder="Your 64-character master key") }}
-        {% if form.master_key.errors %}
-            <div class="flash-error">
-                {% for error in form.master_key.errors %}
-                    {{ error }}
-                {% endfor %}
-            </div>
-        {% endif %}
+    
+    <div class="emergency-notice">
+        <div class="emergency-notice-icon">⚠️</div>
+        <div class="emergency-notice-content">
+            <div class="emergency-notice-title">Emergency Recovery Only</div>
+            <p class="emergency-notice-text">Use this feature only if you've lost your X.509 certificate. You'll need your Master Key that was provided during registration.</p>
+        </div>
     </div>
-    <button type="submit">Recover Account</button>
-</form>
-<a href="{{ url_for('login') }}">← Back to Login</a>
+    
+    <div class="recovery-steps">
+        <h4>How Recovery Works</h4>
+        <ol>
+            <li><strong>Enter your username</strong> to identify your account</li>
+            <li><strong>Provide your Master Key</strong> (64-character recovery code)</li>
+            <li><strong>New certificate generated</strong> automatically for your account</li>
+            <li><strong>Download and save</strong> your new certificate securely</li>
+        </ol>
+    </div>
+    
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            <label for="username">{{ form.username.label }}</label>
+            {{ form.username(size=32, placeholder="Enter your username") }}
+            {% if form.username.errors %}
+                <div class="flash-error" style="margin-top: 0.5rem;">
+                    {% for error in form.username.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <div class="master-key-input-wrapper">
+                <label for="master_key">🔑 {{ form.master_key.label }}</label>
+                {{ form.master_key(size=32, placeholder="Enter your 64-character master recovery key") }}
+                <div class="helper-text">This key was provided when you first created your account. Keep it safe for emergencies like this.</div>
+                {% if form.master_key.errors %}
+                    <div class="flash-error" style="margin-top: 0.5rem; background: rgba(239, 68, 68, 0.2); color: #FEE2E2; border-color: var(--error);">
+                        {% for error in form.master_key.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <button type="submit" class="recovery-button">Recover Account 🔓</button>
+    </form>
+    
+    <div class="info-box">
+        <div class="info-box-title">💡 Don't Have Your Master Key?</div>
+        <p class="info-box-text">Unfortunately, without your Master Key or certificate, account recovery is not possible. This is a security feature to protect your funds. Please contact support if you need assistance.</p>
+    </div>
+    
+    <a href="{{ url_for('login') }}" class="back-link">
+        ← Back to Login
+    </a>
+</div>
 {% endblock %}

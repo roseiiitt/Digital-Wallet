@@ -1,48 +1,213 @@
 {% extends "base.html" %}
 {% block title %}Transfer Funds - Secure Digital Wallet{% endblock %}
 {% block content %}
-<h2>Transfer Funds (Zero-Trust Verification)</h2>
-<div class="warning">
-    <strong>Security Requirement:</strong> You must provide your X.509 certificate for zero-trust verification.<br>
-    This ensures only you can authorize transactions from your wallet.
-</div>
+<style>
+    .transfer-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h2 {
+        margin-bottom: 0.5rem;
+    }
+    
+    .security-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+        padding: 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border-left: 4px solid var(--warning);
+    }
+    
+    .security-notice-icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+    }
+    
+    .security-notice-content {
+        flex: 1;
+    }
+    
+    .security-notice-title {
+        font-weight: 600;
+        color: #92400E;
+        margin-bottom: 0.25rem;
+        font-size: 0.95rem;
+    }
+    
+    .security-notice-text {
+        font-size: 0.85rem;
+        color: #78350F;
+        line-height: 1.5;
+        margin: 0;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .input-with-icon {
+        position: relative;
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.2rem;
+        pointer-events: none;
+    }
+    
+    .input-with-icon input {
+        padding-left: 3rem;
+    }
+    
+    .amount-suggestions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
+    .amount-suggestion {
+        padding: 0.5rem 1rem;
+        background: var(--bg);
+        border: 2px solid var(--border);
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .amount-suggestion:hover {
+        border-color: var(--accent);
+        background: rgba(0, 212, 255, 0.05);
+    }
+    
+    .helper-text {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin-top: 0.5rem;
+    }
+    
+    .certificate-section {
+        background: var(--bg);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px dashed var(--border);
+    }
+    
+    .certificate-section h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--primary);
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+        color: var(--text-light);
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+    
+    .back-link:hover {
+        color: var(--primary);
+    }
+</style>
 
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div>
-        {{ form.recipient.label }}<br>
-        {{ form.recipient(size=32, placeholder="Enter recipient username") }}
-        {% if form.recipient.errors %}
-            <div class="flash-error">
-                {% for error in form.recipient.errors %}
-                    {{ error }}
-                {% endfor %}
-            </div>
-        {% endif %}
+<div class="transfer-container">
+    <div class="page-header">
+        <h2>Send Funds</h2>
+        <p>Transfer money securely to another user</p>
     </div>
-    <div>
-        {{ form.amount.label }}<br>
-        {{ form.amount(size=32, placeholder="0.00") }}
-        {% if form.amount.errors %}
-            <div class="flash-error">
-                {% for error in form.amount.errors %}
-                    {{ error }}
-                {% endfor %}
-            </div>
-        {% endif %}
+    
+    <div class="security-notice">
+        <div class="security-notice-icon">🔒</div>
+        <div class="security-notice-content">
+            <div class="security-notice-title">Zero-Trust Verification Required</div>
+            <p class="security-notice-text">Every transaction must be authenticated with your X.509 certificate to ensure only you can authorize transfers from your wallet.</p>
+        </div>
     </div>
-    <div>
-        {{ form.certificate_pem.label }}<br>
-        <textarea name="certificate_pem" rows="10" placeholder="Paste your X.509 certificate in PEM format"></textarea>
-        {% if form.certificate_pem.errors %}
-            <div class="flash-error">
-                {% for error in form.certificate_pem.errors %}
-                    {{ error }}
-                {% endfor %}
+    
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            <label for="recipient">{{ form.recipient.label }}</label>
+            <div class="input-with-icon">
+                <span class="input-icon">👤</span>
+                {{ form.recipient(size=32, placeholder="Enter recipient's username") }}
             </div>
-        {% endif %}
-    </div>
-    <button type="submit">Send Money (Zero-Trust Verified)</button>
-</form>
-<a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+            <div class="helper-text">The username of the person you want to send funds to</div>
+            {% if form.recipient.errors %}
+                <div class="flash-error" style="margin-top: 0.5rem;">
+                    {% for error in form.recipient.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="amount">{{ form.amount.label }}</label>
+            <div class="input-with-icon">
+                <span class="input-icon">💵</span>
+                {{ form.amount(size=32, placeholder="0.00", step="0.01") }}
+            </div>
+            <div class="amount-suggestions">
+                <div class="amount-suggestion" onclick="document.querySelector('input[name=amount]').value='10.00'">$10</div>
+                <div class="amount-suggestion" onclick="document.querySelector('input[name=amount]').value='25.00'">$25</div>
+                <div class="amount-suggestion" onclick="document.querySelector('input[name=amount]').value='50.00'">$50</div>
+                <div class="amount-suggestion" onclick="document.querySelector('input[name=amount]').value='100.00'">$100</div>
+            </div>
+            {% if form.amount.errors %}
+                <div class="flash-error" style="margin-top: 0.5rem;">
+                    {% for error in form.amount.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <div class="certificate-section">
+                <h4>🔐 Certificate Authentication</h4>
+                <textarea name="certificate_pem" rows="8" placeholder="-----BEGIN CERTIFICATE-----
+Paste your X.509 certificate here to authorize this transaction...
+-----END CERTIFICATE-----"></textarea>
+                <div class="helper-text">Your certificate proves that you authorize this transfer</div>
+                {% if form.certificate_pem.errors %}
+                    <div class="flash-error" style="margin-top: 0.5rem;">
+                        {% for error in form.certificate_pem.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <button type="submit" style="width: 100%;">Send Money Securely 🚀</button>
+    </form>
+    
+    <a href="{{ url_for('dashboard') }}" class="back-link">
+        ← Back to Dashboard
+    </a>
+</div>
 {% endblock %}

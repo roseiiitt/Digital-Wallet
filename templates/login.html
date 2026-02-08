@@ -1,50 +1,155 @@
 {% extends "base.html" %}
 {% block title %}Login - Secure Digital Wallet{% endblock %}
 {% block content %}
-<h2>Login to Your Account</h2>
-<div class="warning">
-    <strong>Zero-Trust Security:</strong> You must provide your X.509 certificate (.pem file) for authentication.<br>
-    Without it, you cannot access your wallet!
+<style>
+    .login-container {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .page-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h2 {
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-header p {
+        font-size: 1rem;
+    }
+    
+    .security-badge {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+        padding: 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border-left: 4px solid var(--info);
+    }
+    
+    .security-badge-icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+    }
+    
+    .security-badge-content {
+        flex: 1;
+    }
+    
+    .security-badge-title {
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 0.25rem;
+        font-size: 0.95rem;
+    }
+    
+    .security-badge-text {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        line-height: 1.5;
+        margin: 0;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .helper-text {
+        font-size: 0.85rem;
+        color: var(--text-light);
+        margin-top: 0.5rem;
+    }
+    
+    .footer-links {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .footer-links a {
+        color: var(--text-light);
+        font-size: 0.9rem;
+    }
+    
+    .footer-links a:hover {
+        color: var(--primary);
+    }
+</style>
+
+<div class="login-container">
+    <div class="page-header">
+        <h2>Welcome Back</h2>
+        <p>Sign in to access your secure wallet</p>
+    </div>
+    
+    <div class="security-badge">
+        <div class="security-badge-icon">🔐</div>
+        <div class="security-badge-content">
+            <div class="security-badge-title">Zero-Trust Authentication</div>
+            <p class="security-badge-text">Your X.509 certificate is required for login. This ensures maximum security for your digital wallet.</p>
+        </div>
+    </div>
+    
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            <label for="username">{{ form.username.label }}</label>
+            {{ form.username(size=32, placeholder="Enter your username") }}
+            {% if form.username.errors %}
+                <div class="flash-error" style="margin-top: 0.5rem;">
+                    {% for error in form.username.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="password">{{ form.password.label }}</label>
+            {{ form.password(size=32, placeholder="Enter your password") }}
+            {% if form.password.errors %}
+                <div class="flash-error" style="margin-top: 0.5rem;">
+                    {% for error in form.password.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="certificate_pem">{{ form.certificate_pem.label }}</label>
+            <textarea name="certificate_pem" rows="8" placeholder="-----BEGIN CERTIFICATE-----
+Paste your X.509 certificate here...
+-----END CERTIFICATE-----"></textarea>
+            <div class="helper-text">Copy and paste your complete certificate including the BEGIN and END lines</div>
+            {% if form.certificate_pem.errors %}
+                <div class="flash-error" style="margin-top: 0.5rem;">
+                    {% for error in form.certificate_pem.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" style="width: 100%;">Sign In Securely 🔒</button>
+    </form>
+    
+    <div class="footer-links">
+        <div>
+            Don't have an account? <a href="{{ url_for('register') }}"><strong>Create one now</strong></a>
+        </div>
+        <div>
+            Lost your certificate? <a href="{{ url_for('recover') }}"><strong>Recover your account</strong></a>
+        </div>
+    </div>
 </div>
-
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div>
-        {{ form.username.label }}<br>
-        {{ form.username(size=32) }}
-        {% if form.username.errors %}
-            <div class="flash-error">
-                {% for error in form.username.errors %}
-                    {{ error }}
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-    <div>
-        {{ form.password.label }}<br>
-        {{ form.password(size=32) }}
-        {% if form.password.errors %}
-            <div class="flash-error">
-                {% for error in form.password.errors %}
-                    {{ error }}
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-    <div>
-        {{ form.certificate_pem.label }}<br>
-        <textarea name="certificate_pem" rows="10" placeholder="Paste your X.509 certificate in PEM format (-----BEGIN CERTIFICATE----- ... -----END CERTIFICATE-----)"></textarea>
-        {% if form.certificate_pem.errors %}
-            <div class="flash-error">
-                {% for error in form.certificate_pem.errors %}
-                    {{ error }}
-                {% endfor %}
-            </div>
-        {% endif %}
-    </div>
-    <button type="submit">Login </button>
-
-</form>
-<p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
-<p>Lost your certificate? <a href="{{ url_for('recover') }}">Recover account</a></p>
 {% endblock %}
