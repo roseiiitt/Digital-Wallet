@@ -67,7 +67,22 @@ ComponentTechnology**Backend**Python 3.12, Flask**Database**SQLite with AES-256-
 📁 Project Structure
 --------------------
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   12345678910111213141516   `
+secure-digital-wallet/
+├── app.py                 # Main Flask application
+├── models.py              # Database models and cryptographic functions
+├── requirements.txt       # Dependencies
+├── .env                   # Environment variables (gitignored)
+├── .gitignore             # Git ignore file
+└── templates/             # HTML templates
+    ├── base.html
+    ├── register.html
+    ├── login.html
+    ├── dashboard.html
+    ├── transfer.html
+    ├── recovery_info.html
+    ├── recover.html
+    ├── password_reset.html
+    └── fund.html
 
 🚀 Installation & Setup
 -----------------------
@@ -80,12 +95,11 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
     
 
 ### Step 1: Clone the Repository
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   bash12   `
+git clone <repository-url>
+cd <directory>
 
 ### Step 2: Install Dependencies
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   bash1   `
+pip install -r requirements.txt
 
 ### Step 3: Configure Stripe (Optional)
 
@@ -94,21 +108,15 @@ Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQL
 2.  Get your test API keys from the [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys)
     
 3.  Create a .env file in the project root:
-    
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   bash12   `
-
-> **Note**: If you don't configure Stripe, the "Add Funds" feature will use a simulated payment flow.
 
 ### Step 4: Run the Application
-
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   bash1   `
+python gui/app.py
 
 ### Step 5: Access the Application
 
 Open your browser and navigate to:
+http://localhost:5000
 
-Plain textANTLR4BashCC#CSSCoffeeScriptCMakeDartDjangoDockerEJSErlangGitGoGraphQLGroovyHTMLJavaJavaScriptJSONJSXKotlinLaTeXLessLuaMakefileMarkdownMATLABMarkupObjective-CPerlPHPPowerShell.propertiesProtocol BuffersPythonRRubySass (Sass)Sass (Scss)SchemeSQLShellSwiftSVGTSXTypeScriptWebAssemblyYAMLXML`   1   `
 
 🧪 Usage Guide
 --------------
@@ -196,10 +204,6 @@ All sensitive data is encrypted using AES-256-GCM:
 *   **Certificate validation**: Byte-by-byte comparison with stored certificates
     
 
-### Cryptographic Algorithms
-
-AlgorithmPurposeLocation**AES-256-GCM**Database encryptionmodels.py**RSA-2048**Key pairs & certificatesmodels.py**PBKDF2-HMAC-SHA256**Key derivationmodels.py**RSA-PSS-SHA256**Digital signaturesCertificate validation**X.509 PKI**Identity bindingmodels.py
-
 📊 Testing
 ----------
 
@@ -262,24 +266,3 @@ The application includes comprehensive testing scenarios:
     
 *   **Troubleshooting**: Common issues and solutions
     
-
-🎯 Requirements Fulfillment
----------------------------
-
-This implementation satisfies all original requirements:✅ **User Authentication**: PKI-based with digital certificates✅ **Document Signing**: RSA-PSS signatures with certificate validation✅ **Security Features**: Confidentiality (AES), Integrity (GCM), Authentication (PKI)✅ **Key Management**: Secure generation, encrypted storage, and recovery mechanisms
-
-📜 License
-----------
-
-This project is for educational and demonstration purposes. The cryptographic implementations follow industry standards and best practices.
-
-🙏 Acknowledgments
-------------------
-
-*   **Flask**: Web framework
-    
-*   **cryptography.io**: Cryptographic primitives
-    
-*   **Stripe**: Payment processing
-    
-*   **SQLite**: Embedded database
