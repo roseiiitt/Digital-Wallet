@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Login - Secure Digital Wallet{% endblock %}
+{% block content %}
+<h2>Login to Your Account</h2>
+<div class="warning">
+    <strong>Zero-Trust Security:</strong> You must provide your X.509 certificate (.pem file) for authentication.<br>
+    Without it, you cannot access your wallet!
+</div>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.username.label }}<br>
+        {{ form.username(size=32) }}
+        {% if form.username.errors %}
+            <div class="flash-error">
+                {% for error in form.username.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div>
+        {{ form.password.label }}<br>
+        {{ form.password(size=32) }}
+        {% if form.password.errors %}
+            <div class="flash-error">
+                {% for error in form.password.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div>
+        {{ form.certificate_pem.label }}<br>
+        <textarea name="certificate_pem" rows="10" placeholder="Paste your X.509 certificate in PEM format (-----BEGIN CERTIFICATE----- ... -----END CERTIFICATE-----)"></textarea>
+        {% if form.certificate_pem.errors %}
+            <div class="flash-error">
+                {% for error in form.certificate_pem.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <button type="submit">Login </button>
+
+</form>
+<p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+<p>Lost your certificate? <a href="{{ url_for('recover') }}">Recover account</a></p>
+{% endblock %}

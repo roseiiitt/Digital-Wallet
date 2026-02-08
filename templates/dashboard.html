@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Secure Digital Wallet{% endblock %}
+{% block content %}
+<h2>Welcome, {{ session.username }}!</h2>
+<div style="display: flex; gap: 20px; margin: 20px 0;">
+    <div style="background: #e9ecef; padding: 20px; border-radius: 8px; flex: 1;">
+        <h3>Balance</h3>
+        <p style="font-size: 24px; font-weight: bold;">${{ "%.2f"|format(user.balance) }}</p>
+    </div>
+    <div style="background: #e9ecef; padding: 20px; border-radius: 8px; flex: 1;">
+        <h3>Recent Transactions</h3>
+        <p>{{ transactions|length }} transactions</p>
+    </div>
+</div>
+
+<h3>Recent Activity</h3>
+{% if transactions %}
+<table>
+    <thead>
+        <tr>
+            <th>Transaction ID</th>
+            <th>Type</th>
+            <th>Counterparty</th>
+            <th>Amount</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tx in transactions %}
+        <tr>
+            <td>{{ tx.transaction_id[:8] }}...</td>
+            <td>{% if tx.sender_id == user.id %}Sent{% else %}Received{% endif %}</td>
+            <td>{% if tx.sender_id == user.id %}{{ tx.recipient.username }}{% else %}{{ tx.sender.username }}{% endif %}</td>
+            <td>${{ "%.2f"|format(tx.amount) }}</td>
+            <td>{{ tx.timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No transactions yet.</p>
+{% endif %}
+{% endblock %}

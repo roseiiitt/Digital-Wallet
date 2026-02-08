@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Register - Secure Digital Wallet{% endblock %}
+{% block content %}
+<h2>Create Account</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.username.label }}<br>
+        {{ form.username(size=32, placeholder="At least 5 characters") }}
+        {% if form.username.errors %}
+            <div class="flash-error">
+                {% for error in form.username.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div>
+        {{ form.password.label }}<br>
+        {{ form.password(size=32, placeholder="At least 8 characters") }}
+        {% if form.password.errors %}
+            <div class="flash-error">
+                {% for error in form.password.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <button type="submit">Register</button>
+</form>
+<p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+{% endblock %}

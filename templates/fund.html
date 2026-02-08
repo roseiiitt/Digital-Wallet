@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Add Funds - Secure Digital Wallet{% endblock %}
+{% block content %}
+<h2>Add Funds via Stripe Sandbox</h2>
+<div class="warning">
+    <strong>Stripe Test Mode:</strong> Use test card <code>4242 4242 4242 4242</code> for payments.<br>
+    This is a sandbox environment - no real money will be charged.
+</div>
+
+<form method="POST">
+    <div>
+        <label for="amount">Amount (USD):</label><br>
+        <input type="number" id="amount" name="amount" min="1" step="0.01" required placeholder="10.00">
+    </div>
+    <button type="submit" style="background: #635BFF; color: white;">Add Funds via Stripe</button>
+</form>
+
+<a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+{% endblock %}

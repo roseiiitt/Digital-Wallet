@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Transfer Funds - Secure Digital Wallet{% endblock %}
+{% block content %}
+<h2>Transfer Funds (Zero-Trust Verification)</h2>
+<div class="warning">
+    <strong>Security Requirement:</strong> You must provide your X.509 certificate for zero-trust verification.<br>
+    This ensures only you can authorize transactions from your wallet.
+</div>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.recipient.label }}<br>
+        {{ form.recipient(size=32, placeholder="Enter recipient username") }}
+        {% if form.recipient.errors %}
+            <div class="flash-error">
+                {% for error in form.recipient.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div>
+        {{ form.amount.label }}<br>
+        {{ form.amount(size=32, placeholder="0.00") }}
+        {% if form.amount.errors %}
+            <div class="flash-error">
+                {% for error in form.amount.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div>
+        {{ form.certificate_pem.label }}<br>
+        <textarea name="certificate_pem" rows="10" placeholder="Paste your X.509 certificate in PEM format"></textarea>
+        {% if form.certificate_pem.errors %}
+            <div class="flash-error">
+                {% for error in form.certificate_pem.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <button type="submit">Send Money (Zero-Trust Verified)</button>
+</form>
+<a href="{{ url_for('dashboard') }}">← Back to Dashboard</a>
+{% endblock %}

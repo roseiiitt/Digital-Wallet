@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Recovery Information - Secure Digital Wallet{% endblock %}
+{% block content %}
+<h2>⚠️ CRITICAL: Save Your Recovery Information!</h2>
+
+<div class="warning">
+    <strong>Master Key (For Account Recovery):</strong><br>
+    <div class="master-key-box">{{ master_key }}</div>
+</div>
+
+<div class="certificate-box">
+    <strong>Your X.509 Certificate:</strong><br>
+    <pre>{{ certificate_pem }}</pre>
+</div>
+
+<div style="margin: 20px 0;">
+    <h3>Important Security Instructions:</h3>
+    <ol>
+        <li><strong>Save your Master Key immediately</strong> - write it down and store it securely</li>
+        <li><strong>Download your certificate</strong> - you'll need it for every login</li>
+        <li><strong>Never share either</strong> - they provide full access to your wallet</li>
+        <li><strong>If you lose your certificate</strong>, use the Master Key to recover your account</li>
+    </ol>
+</div>
+
+<a href="{{ url_for('download_certificate', user_id=user.id) }}" class="btn" style="display: inline-block; background: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-right: 10px;">
+    📥 Download Certificate (.pem)
+</a>
+
+<a href="{{ url_for('login') }}" class="btn" style="display: inline-block; background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+    → Proceed to Login
+</a>
+
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Account Recovery - Secure Digital Wallet{% endblock %}
+{% block content %}
+<h2>Account Recovery</h2>
+<div class="warning">
+    <strong>Use this only if you lost your certificate!</strong><br>
+    You'll need your Master Key to regenerate a new certificate.
+</div>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div>
+        {{ form.username.label }}<br>
+        {{ form.username(size=32, placeholder="Your username") }}
+        {% if form.username.errors %}
+            <div class="flash-error">
+                {% for error in form.username.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div>
+        {{ form.master_key.label }}<br>
+        {{ form.master_key(size=32, placeholder="Your 64-character master key") }}
+        {% if form.master_key.errors %}
+            <div class="flash-error">
+                {% for error in form.master_key.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <button type="submit">Recover Account</button>
+</form>
+<a href="{{ url_for('login') }}">← Back to Login</a>
+{% endblock %}
