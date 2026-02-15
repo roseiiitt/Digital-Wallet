@@ -1,5 +1,5 @@
+<img width="350" height="90" alt="image" src="https://github.com/user-attachments/assets/ecec7e96-49f1-4eae-8b25-2aca67c46673" />
 
-<img width="94" height="90" alt="image" src="https://github.com/user-attachments/assets/21850dfa-4fb0-4db8-b3e3-6d4fd96885c1" />
 ST6051CEM Practical Cryptography
 
 
