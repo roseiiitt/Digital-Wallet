@@ -1,6 +1,8 @@
+<div align="center">
 
+<img width="350" height="90" alt="image" src="https://github.com/user-attachments/assets/b80f3aca-0e36-4cb2-b289-058014e62cbc" alt="Softwartica College of IT & E-Commerce in collaboration with Coventry University" width="700"/>
 
-<img src="https://private-user-images.githubusercontent.com/145916384/550095645-ecec7e96-49f1-4eae-8b25-2aca67c46673.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NzExMzY4NjEsIm5iZiI6MTc3MTEzNjU2MSwicGF0aCI6Ii8xNDU5MTYzODQvNTUwMDk1NjQ1LWVjZWM3ZTk2LTQ5ZjEtNGVhZS04YjI1LTJhY2E2N2M0NjY3My5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYwMjE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MDIxNVQwNjIyNDFaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0yZWNhY2Y2ODc1Yjk3MTJjOTg4ZDZmMTc0Yzc3M2RjNjhkYmNkN2ViMGU0MTIzMzAzNTI0NDQ3YjQ2MmJkNWVkJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.P0jyNHQHeIJYpOyT8hrVVwrFHq-_WdVg0qt2oc380dQ" alt="Softwarica College of IT and E-commerce" width="600"/>
+<br><br>
 
 <h1>Secure Digital Wallet System</h1>
 <h3>ST6051CEM Practical Cryptography Coursework</h3>
@@ -43,7 +45,8 @@ The digital wallet provides core financial functionalities such as secure money 
 ## 🏗️ System Architecture
 
 <div align="center">
-<img src="![Architecture](https://github.com/user-attachments/assets/98b0daf3-9a3b-4415-a2d9-e18b35facd9b)" alt="System Architecture" width="800"/>
+  <img src="https://raw.githubusercontent.com/roseiiitt/Digital-Wallet/main/Architecture_new.jpg" 
+       alt="System Architecture Diagram" width="900"/>
 </div>
 
 The system architecture follows a three-tier design pattern with enhanced security layers:
@@ -466,7 +469,9 @@ pytest unit_test/ --cov=.
 ## 👨‍🎓 Course Information
 
 **Module**: ST6051CEM Practical Cryptography  
-**Institution**: Softwarica College of IT & E-Commerce 
+**Institution**: Softwartica College of IT & E-Commerce  
+**In Collaboration With**: Coventry University  
 
+© 2026 Softwartica College of IT & E-Commerce in collaboration with Coventry University. All rights reserved.
 
 </div>
