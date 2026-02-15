@@ -1,273 +1,472 @@
-<img width="350" height="90" alt="image" src="https://github.com/user-attachments/assets/ecec7e96-49f1-4eae-8b25-2aca67c46673" />
-
-ST6051CEM Practical Cryptography
 
 
-🔐 Secure Digital Wallet with PKI & Zero-Trust Security
-=======================================================
+<img src="https://private-user-images.githubusercontent.com/145916384/550095645-ecec7e96-49f1-4eae-8b25-2aca67c46673.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NzExMzY4NjEsIm5iZiI6MTc3MTEzNjU2MSwicGF0aCI6Ii8xNDU5MTYzODQvNTUwMDk1NjQ1LWVjZWM3ZTk2LTQ5ZjEtNGVhZS04YjI1LTJhY2E2N2M0NjY3My5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYwMjE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MDIxNVQwNjIyNDFaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0yZWNhY2Y2ODc1Yjk3MTJjOTg4ZDZmMTc0Yzc3M2RjNjhkYmNkN2ViMGU0MTIzMzAzNTI0NDQ3YjQ2MmJkNWVkJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.P0jyNHQHeIJYpOyT8hrVVwrFHq-_WdVg0qt2oc380dQ" alt="Softwarica College of IT and E-commerce" width="600"/>
 
-A fully functional digital wallet implementation that uses Public Key Infrastructure (PKI) for user authentication and secure document signing. The system ensures confidentiality, integrity, and authentication through cryptographic primitives including digital certificates, digital signatures, and asymmetric encryption.
+<h1>Secure Digital Wallet System</h1>
+<h3>ST6051CEM Practical Cryptography Coursework</h3>
 
-🎯 Features
------------
+<p><strong>A PKI-based Digital Wallet with Zero-Trust Architecture</strong></p>
 
-### ✅ **User Authentication**
+[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.0-green.svg)](https://flask.palletsprojects.com/)
+[![Cryptography](https://img.shields.io/badge/Cryptography-AES--256--GCM-red.svg)](https://cryptography.io/)
+[![License](https://img.shields.io/badge/License-Academic-yellow.svg)](LICENSE)
 
-*   **PKI-based authentication** using X.509 certificates
-    
-*   **Username requirements**: Minimum 5 characters
-    
-*   **Password requirements**: Minimum 8 characters
-    
-*   **Zero-trust login**: Requires username + password + certificate
-    
-*   **Master key recovery**: Account recovery if certificate is lost
-    
+---
 
-### ✅ **Document Signing & Verification**
+</div>
 
-*   **Digital signatures** using RSA-PSS with SHA-256
-    
-*   **Transaction receipts** with non-repudiable signatures
-    
-*   **Certificate validation** against trusted Certificate Authority
-    
+## 📋 Table of Contents
 
-### ✅ **Security Features**
+- [Abstract](#-abstract)
+- [System Architecture](#-system-architecture)
+- [Key Features](#-key-features)
+- [Security Implementation](#-security-implementation)
+- [Project Structure](#-project-structure)
+- [Installation Guide](#-installation-guide)
+- [Usage Documentation](#-usage-documentation)
+- [Cryptographic Stack](#-cryptographic-stack)
+- [Testing Framework](#-testing-framework)
+- [Technical Specifications](#-technical-specifications)
+- [References](#-references)
 
-*   **AES-256-GCM encryption** for all sensitive database fields
-    
-*   **Zero-trust architecture**: Every sensitive operation requires certificate verification
-    
-*   **Encrypted storage**: Passwords, private keys, certificates, and master keys encrypted at rest
-    
-*   **Unique per-user encryption keys** derived from username + salt
-    
+---
 
-### ✅ **Financial Operations**
+## 📄 Abstract
 
-*   **Secure money transfers** between users
-    
-*   **Balance management** with atomic database transactions
-    
-*   **Transaction history** with complete audit trail
-    
-*   **Stripe integration** for adding funds via payment processing
-    
+This project presents a comprehensive implementation of a secure digital wallet system leveraging Public Key Infrastructure (PKI) for authentication and transaction authorization. The system employs a zero-trust security model where every sensitive operation requires cryptographic proof through X.509 digital certificates. The implementation demonstrates practical applications of cryptographic primitives including asymmetric encryption (RSA-2048), symmetric encryption (AES-256-GCM), digital signatures (RSA-PSS with SHA-256), and secure key derivation (PBKDF2-HMAC-SHA256).
 
-### ✅ **Web Interface**
+The digital wallet provides core financial functionalities such as secure money transfers, balance management, and payment gateway integration, while maintaining strict security guarantees of confidentiality, integrity, authentication, and non-repudiation through cryptographic mechanisms.
 
-*   **Responsive web application** using Flask
-    
-*   **Complete user workflow**: Registration → Login → Transfer → Recovery
-    
-*   **Professional UI** with proper error handling and security warnings
-    
+---
 
-🛠️ Technology Stack
---------------------
+## 🏗️ System Architecture
 
-ComponentTechnology**Backend**Python 3.12, Flask**Database**SQLite with AES-256-GCM encryption**Cryptography**cryptography.io library**Frontend**HTML5, CSS3, Jinja2 templates**Payment**Stripe API (sandbox mode)**Security**PKI, X.509 certificates, RSA-2048, AES-256-GCM
+<div align="center">
+<img src="![Architecture](https://github.com/user-attachments/assets/98b0daf3-9a3b-4415-a2d9-e18b35facd9b)" alt="System Architecture" width="800"/>
+</div>
 
-📁 Project Structure
---------------------
+The system architecture follows a three-tier design pattern with enhanced security layers:
 
-secure-digital-wallet/
-├── app.py                 # Main Flask application
-├── models.py              # Database models and cryptographic functions
-├── requirements.txt       # Dependencies
-├── .env                   # Environment variables (gitignored)
-├── .gitignore             # Git ignore file
-└── templates/             # HTML templates
-    ├── base.html
-    ├── register.html
-    ├── login.html
-    ├── dashboard.html
-    ├── transfer.html
-    ├── recovery_info.html
-    ├── recover.html
-    ├── password_reset.html
-    └── fund.html
+**Presentation Layer**: Flask-based web interface with responsive HTML templates and client-side validation.
 
-🚀 Installation & Setup
------------------------
+**Application Layer**: Python backend implementing business logic, cryptographic operations, and zero-trust authentication mechanisms.
+
+**Data Layer**: SQLite database with field-level AES-256-GCM encryption for sensitive data protection.
+
+**Security Layer**: PKI infrastructure with certificate authority, digital signature verification, and encrypted key storage.
+
+---
+
+## ✨ Key Features
+
+### 🔐 Authentication & Authorization
+- **PKI-based Authentication**: X.509 certificate verification for every login attempt
+- **Zero-Trust Architecture**: Certificate-based authorization for all sensitive operations
+- **Multi-Factor Security**: Username + Password + Digital Certificate requirement
+- **Account Recovery**: Master key-based certificate regeneration mechanism
+
+### 🔏 Cryptographic Operations
+- **Digital Signatures**: RSA-PSS with SHA-256 for transaction non-repudiation
+- **Document Signing**: Cryptographically signed transaction receipts
+- **Certificate Validation**: Server-side verification against trusted Certificate Authority
+- **Encrypted Storage**: AES-256-GCM encryption for all sensitive database fields
+
+### 💰 Financial Operations
+- **Secure Transfers**: Atomic database transactions with rollback capabilities
+- **Balance Management**: Real-time balance tracking with encryption
+- **Payment Integration**: Stripe API integration for fund deposits (sandbox mode)
+- **Transaction History**: Complete audit trail with cryptographic signatures
+
+### 🛡️ Security Guarantees
+- **Confidentiality**: AES-256-GCM encryption with unique per-user keys
+- **Integrity**: SHA-256 hashing and digital signatures for tamper detection
+- **Authentication**: Certificate-based identity verification
+- **Non-repudiation**: RSA-PSS digital signatures on all transactions
+
+---
+
+## 🔒 Security Implementation
+
+### Database Encryption Model
+
+The system implements field-level encryption with the following security properties:
+
+**Encrypted Fields**:
+- User passwords (bcrypt + AES-256-GCM double encryption)
+- RSA private keys (PEM format, AES-256-GCM encrypted)
+- X.509 certificates (PEM format, AES-256-GCM encrypted)
+- Master recovery keys (AES-256-GCM encrypted)
+
+**Unencrypted Fields** (for operational efficiency):
+- Username (required for login queries)
+- Balance (required for transaction validation)
+- Transaction metadata (timestamps, transaction IDs)
+
+### Key Derivation Scheme
+
+Each user has a unique encryption key derived using PBKDF2-HMAC-SHA256:
+
+```
+User Encryption Key = PBKDF2(
+    password = username,
+    salt = 16-byte cryptographic random salt,
+    iterations = 100,000,
+    hash = SHA-256,
+    key_length = 32 bytes
+)
+```
+
+### Zero-Trust Security Model
+
+Every sensitive operation follows the zero-trust principle:
+
+1. **Login**: Username + Password + Certificate verification
+2. **Transfer**: Certificate verification before transaction processing
+3. **Password Reset**: Certificate verification before password update
+4. **Account Recovery**: Master key verification before certificate regeneration
+
+---
+
+## 📁 Project Structure
+
+```
+.
+├── Architecture.jpg
+├── README.md
+├── __pycache__
+│   ├── app.cpython-312.pyc
+│   └── models.cpython-312.pyc
+├── app.py
+├── favicon.ico
+├── instance
+│   └── wallet.db
+├── models.py
+├── requirements.txt
+├── templates
+│   ├── base.html
+│   ├── dashboard.html
+│   ├── download_cert.html
+│   ├── fund.html
+│   ├── login.html
+│   ├── password_reset.html
+│   ├── recover.html
+│   ├── recovery_info.html
+│   ├── register.html
+│   └── transfer.html
+└── unit_test
+    ├── __pycache__
+    │   ├── conftest.cpython-312-pytest-9.0.2.pyc
+    │   ├── test_auth.cpython-312-pytest-9.0.2.pyc
+    │   ├── test_registration.cpython-312-pytest-9.0.2.pyc
+    │   ├── test_routes.cpython-312-pytest-9.0.2.pyc
+    │   ├── test_transfer_requires_login.cpython-312-pytest-9.0.2.pyc
+    │   └── test_wallet.cpython-312-pytest-9.0.2.pyc
+    ├── conftest.py
+    ├── test_auth.py
+    ├── test_registration.py
+    ├── test_routes.py
+    ├── test_transfer_requires_login.py
+    └── test_wallet.py
+
+6 directories, 31 files
+```
+
+### Component Descriptions
+
+| Component | Purpose |
+|-----------|---------|
+| `app.py` | Main Flask application with routing and request handling |
+| `models.py` | Database models and cryptographic utility functions |
+| `templates/` | Jinja2 HTML templates for web interface |
+| `unit_test/` | Comprehensive pytest test suite |
+| `instance/wallet.db` | SQLite database with encrypted user data |
+| `requirements.txt` | Python package dependencies |
+| `Architecture.jpg` | System architecture diagram |
+
+---
+
+## 🚀 Installation Guide
 
 ### Prerequisites
 
-*   Python 3.8+
-    
-*   pip package manager
-    
+- Python 3.8 or higher
+- pip package manager
+- Git version control system
+- OpenSSL (for cryptographic operations)
 
-### Step 1: Clone the Repository
-git clone <repository-url>
-cd <directory>
+### Step 1: Clone Repository
 
-### Step 2: Install Dependencies
+```bash
+git clone https://github.com/roseiiitt/Digital-Wallet.git
+cd Digital-Wallet
+```
+
+### Step 2: Create Virtual Environment
+
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+```
+
+### Step 3: Install Dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-### Step 3: Configure Stripe (Optional)
+Required packages:
+- Flask (web framework)
+- Flask-SQLAlchemy (ORM)
+- cryptography (cryptographic operations)
+- bcrypt (password hashing)
+- stripe (payment processing)
+- pytest (testing framework)
 
-1.  Create a [Stripe account](https://stripe.com/)
-    
-2.  Get your test API keys from the [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys)
-    
-3.  Create a .env file in the project root:
+### Step 4: Configure Environment Variables
 
-### Step 4: Run the Application
-python gui/app.py
+Create a `.env` file in the project root:
 
-### Step 5: Access the Application
+```env
+SECRET_KEY=your-secret-key-here
+STRIPE_PUBLIC_KEY=your-stripe-public-key
+STRIPE_SECRET_KEY=your-stripe-secret-key
+STRIPE_WEBHOOK_SECRET=your-webhook-secret
+```
 
-Open your browser and navigate to:
-http://localhost:5000
+### Step 5: Initialize Database
+
+```bash
+# The database will be created automatically on first run
+python app.py
+```
+
+### Step 6: Run Application
+
+```bash
+python app.py
+```
+
+Access the application at: `http://localhost:5000`
+
+---
+
+## 📖 Usage Documentation
+
+### User Registration
+
+1. Navigate to the registration page
+2. Enter username (minimum 5 characters)
+3. Enter password (minimum 8 characters)
+4. Click "Register"
+5. **CRITICAL**: Save your Master Key securely
+6. Download your digital certificate (.pem file)
+7. Store both securely for account recovery
+
+### User Login
+
+1. Enter username and password
+2. Paste your digital certificate in PEM format
+3. Click "Login"
+4. Certificate is verified against stored certificate
+5. Access granted upon successful verification
+
+### Money Transfer
+
+1. Navigate to "Transfer" page
+2. Enter recipient username
+3. Enter transfer amount
+4. Paste your digital certificate for authorization
+5. Transaction is processed and signed
+6. Both parties receive cryptographically signed receipts
+
+### Account Recovery
+
+If you lose your digital certificate:
+
+1. Navigate to "Recover Account"
+2. Enter your username
+3. Enter your Master Key (saved during registration)
+4. New certificate is generated
+5. Download new certificate
+6. Update stored certificate for future logins
+
+### Password Reset
+
+1. Navigate to "Forgot Password"
+2. Enter username and new password
+3. Paste your digital certificate for verification
+4. Password is reset upon certificate validation
+
+### Adding Funds
+
+1. Click "Add Funds" on dashboard
+2. Redirected to Stripe payment page (sandbox mode)
+3. Use test card: `4242 4242 4242 4242`
+4. Enter any future expiry date and CVC
+5. Complete payment
+6. Funds credited to wallet balance
+
+---
+
+## 🔐 Cryptographic Stack
+
+### Asymmetric Encryption
+- **Algorithm**: RSA with 2048-bit key size
+- **Key Generation**: cryptography.io's RSA key generation
+- **Serialization**: PEM format with no encryption (encrypted separately with AES-256-GCM)
+
+### Symmetric Encryption
+- **Algorithm**: AES-256-GCM (Galois/Counter Mode)
+- **Key Size**: 256 bits
+- **Nonce**: 96-bit random nonce per encryption
+- **Authentication**: Built-in AEAD authentication tag
+
+### Digital Signatures
+- **Algorithm**: RSA-PSS (Probabilistic Signature Scheme)
+- **Hash Function**: SHA-256
+- **Salt Length**: PSS.MAX_LENGTH
+- **Padding**: PSS padding with MGF1
+
+### Key Derivation
+- **Algorithm**: PBKDF2-HMAC-SHA256
+- **Iterations**: 100,000
+- **Salt**: 16-byte cryptographic random salt per user
+- **Output**: 256-bit encryption key
+
+### Password Hashing
+- **Algorithm**: bcrypt
+- **Work Factor**: 12 rounds
+- **Salt**: Automatically generated per password
+
+### X.509 Certificates
+- **Subject**: Username as Common Name (CN)
+- **Validity**: 365 days
+- **Serial Number**: Cryptographic random
+- **Signature Algorithm**: SHA-256 with RSA
+
+---
+
+## 🧪 Testing Framework
+
+The project includes comprehensive unit tests using pytest:
+
+### Test Coverage
+
+| Test Module | Coverage |
+|-------------|----------|
+| `test_registration.py` | User registration, certificate generation |
+| `test_auth.py` | Login, certificate verification, zero-trust |
+| `test_wallet.py` | Money transfers, balance management |
+| `test_routes.py` | Flask route testing, HTTP responses |
+| `test_transfer_requires_login.py` | Authorization checks |
+
+### Running Tests
+
+```bash
+# Run all tests
+pytest unit_test/
+
+# Run specific test file
+pytest unit_test/test_auth.py
+
+# Run with verbose output
+pytest unit_test/ -v
+
+# Run with coverage report
+pytest unit_test/ --cov=.
+```
+
+### Test Scenarios
+
+**Security Tests**:
+- Certificate tampering detection
+- Invalid certificate rejection
+- Master key validation
+- Password strength enforcement
+
+**Functional Tests**:
+- User registration workflow
+- Login with certificate
+- Money transfer with insufficient balance
+- Payment gateway integration (sandbox)
+- Account recovery mechanism
+
+**Edge Cases**:
+- Duplicate username registration
+- Transfer to non-existent user
+- Negative amount transfers
+- Database transaction rollback
+
+---
+
+## 📊 Technical Specifications
+
+### System Requirements
+
+| Component | Specification |
+|-----------|---------------|
+| **Python Version** | 3.8+ (tested on 3.12) |
+| **Database** | SQLite 3.x |
+| **Web Server** | Flask development server |
+| **Cryptography Library** | cryptography 42.x+ |
+| **Memory** | Minimum 512 MB RAM |
+| **Storage** | 50 MB for application + database |
+
+### Performance Characteristics
+
+| Operation | Time Complexity | Notes |
+|-----------|----------------|-------|
+| User Registration | O(1) + Key Generation | ~200ms including RSA key generation |
+| Login Verification | O(1) + Certificate Verification | ~50ms for database + cryptography |
+| Money Transfer | O(1) + Signature Generation | ~100ms including digital signature |
+| Database Encryption | O(n) per field | AES-256-GCM encryption overhead |
+
+### Security Parameters
+
+| Parameter | Value | Standard |
+|-----------|-------|----------|
+| RSA Key Size | 2048 bits | NIST SP 800-57 |
+| AES Key Size | 256 bits | FIPS 197 |
+| PBKDF2 Iterations | 100,000 | OWASP recommendation |
+| bcrypt Work Factor | 12 rounds | OWASP recommendation |
+| Certificate Validity | 365 days | Configurable |
+
+---
+
+## 📚 References
+
+### Academic Standards
+- NIST Special Publication 800-57: Recommendation for Key Management
+- FIPS 197: Advanced Encryption Standard (AES)
+- RFC 5280: Internet X.509 Public Key Infrastructure Certificate
+- RFC 8017: PKCS #1 RSA Cryptography Specifications
+
+### Libraries & Frameworks
+- [Python Cryptography Library](https://cryptography.io/)
+- [Flask Web Framework](https://flask.palletsprojects.com/)
+- [SQLAlchemy ORM](https://www.sqlalchemy.org/)
+- [Stripe Payment API](https://stripe.com/docs/api)
+
+### Security Best Practices
+- OWASP Top 10 Security Risks
+- Zero Trust Security Model (NIST SP 800-207)
+- PKI Best Practices (CA/Browser Forum)
+
+---
+
+<div align="center">
+
+## 👨‍🎓 Course Information
+
+**Module**: ST6051CEM Practical Cryptography  
+**Institution**: Softwarica College of IT & E-Commerce 
 
 
-🧪 Usage Guide
---------------
-
-### 1\. User Registration
-
-1.  Click "Register"
-    
-2.  Enter username (min 5 chars) and password (min 8 chars)
-    
-3.  **Save your Master Key and Certificate** - these are critical for account recovery!
-    
-4.  Download your certificate (.pem file)
-    
-
-### 2\. User Login
-
-1.  Enter username and password
-    
-2.  **Paste your certificate** in PEM format (required for zero-trust authentication)
-    
-3.  Access your dashboard
-    
-
-### 3\. Money Transfer
-
-1.  Go to "Transfer" page
-    
-2.  Enter recipient username and amount
-    
-3.  **Paste your certificate** for transaction authorization
-    
-4.  Transaction is processed with dual receipt generation
-    
-
-### 4\. Account Recovery
-
-1.  If you lose your certificate, go to "Recover Account"
-    
-2.  Enter your username and **Master Key**
-    
-3.  New certificate is generated and available for download
-    
-
-### 5\. Password Reset
-
-1.  Go to "Forgot Password"
-    
-2.  Enter username, new password, and **certificate**
-    
-3.  Password is reset with certificate verification
-    
-
-### 6\. Add Funds
-
-1.  Click "Add Funds"
-    
-2.  You'll be redirected to Stripe sandbox
-    
-3.  Use test card: 4242 4242 4242 4242
-    
-4.  Funds are added to your wallet upon successful payment
-    
-
-🔒 Security Architecture
-------------------------
-
-### Database Encryption
-
-All sensitive data is encrypted using AES-256-GCM:
-
-*   **Encrypted fields**: Password hashes, private keys, certificates, master keys
-    
-*   **Unencrypted fields**: Username (for login queries), balance (for efficient operations)
-    
-*   **Key derivation**: PBKDF2-HMAC-SHA256 with unique salt per user
-    
-
-### Zero-Trust Principles
-
-*   **Never trust, always verify**: Every sensitive operation requires certificate proof
-    
-*   **Minimal session data**: Only user ID stored in session
-    
-*   **Certificate validation**: Byte-by-byte comparison with stored certificates
-    
-
-📊 Testing
-----------
-
-The application includes comprehensive testing scenarios:
-
-### Security Tests
-
-*   Certificate validation and tampering detection
-    
-*   Password strength enforcement
-    
-*   Username uniqueness validation
-    
-*   Master key recovery functionality
-    
-
-### Functional Tests
-
-*   User registration and certificate generation
-    
-*   Zero-trust login with certificate verification
-    
-*   Money transfer with balance validation
-    
-*   Stripe payment integration (sandbox mode)
-    
-*   Password reset with certificate authentication
-    
-
-### Error Handling
-
-*   Proper error messages for invalid certificates
-    
-*   Graceful handling of database errors
-    
-*   User-friendly validation messages
-    
-
-📝 Documentation
-----------------
-
-### Technical Documentation
-
-*   **Architecture diagram**: JSON format for Nano Banana import
-    
-*   **Gantt chart**: Complete project timeline with milestones
-    
-*   **Cryptographic stack**: Detailed algorithm explanations
-    
-*   **API endpoints**: All Flask routes documented
-    
-
-### User Documentation
-
-*   **Registration guide**: Step-by-step account creation
-    
-*   **Certificate management**: How to save and use certificates
-    
-*   **Security best practices**: Master key storage recommendations
-    
-*   **Troubleshooting**: Common issues and solutions
-    
+</div>
