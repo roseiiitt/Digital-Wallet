@@ -12,7 +12,6 @@
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.0-green.svg)](https://flask.palletsprojects.com/)
 [![Cryptography](https://img.shields.io/badge/Cryptography-AES--256--GCM-red.svg)](https://cryptography.io/)
-[![License](https://img.shields.io/badge/License-Academic-yellow.svg)](LICENSE)
 
 ---
 
