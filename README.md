@@ -1,3 +1,8 @@
+
+<img width="94" height="90" alt="image" src="https://github.com/user-attachments/assets/21850dfa-4fb0-4db8-b3e3-6d4fd96885c1" />
+ST6051CEM Practical Cryptography
+
+
 🔐 Secure Digital Wallet with PKI & Zero-Trust Security
 =======================================================
 
