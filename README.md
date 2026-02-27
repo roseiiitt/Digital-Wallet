@@ -255,7 +255,7 @@ python app.py
 python app.py
 ```
 
-Access the application at: `http://localhost:5000`
+Access the application at: `https://localhost:5000`
 
 ---
 
