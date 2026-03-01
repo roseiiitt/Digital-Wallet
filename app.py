@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file, jsonify
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, FloatField
-from wtforms.validators import DataRequired, Length, NumberRange
-from models import db, User, Transaction, ca, encrypt_data
+from wtforms.validators import DataRequired, Length, NumberRange, Regexp
+from models import db, User, Transaction, ca, encrypt_data, verify_certificate
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography import x509
@@ -12,29 +12,61 @@ import io
 import os
 import stripe
 from dotenv import load_dotenv
+import ssl
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'very-secret-key-change-this-in-production-1234567890'
-
+app.config['SECRET_KEY'] = '1234567890'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///wallet.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Secure session configuration
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+    PERMANENT_SESSION_LIFETIME=1800
+)
+
+# Stripe configuration
 stripe.api_key = os.getenv('STRIPE_SECRET_KEY')
 app.config['STRIPE_PUBLIC_KEY'] = os.getenv('STRIPE_PUBLISHABLE_KEY')
+
+
+# Security headers
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    if not app.debug:
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://js.stripe.com; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self'  https://q.stripe.com; "
+        "frame-src https://checkout.stripe.com; "
+        "connect-src 'self' https://api.stripe.com"
+    )
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    return response
 
 db.init_app(app)
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[
-        DataRequired(), 
-        Length(min=5, max=80, message="Username must be at least 5 characters")
+        DataRequired(),
+        Length(min=5, max=20),
+        Regexp(r'^[a-zA-Z0-9_]+$', message="Username can only contain letters, numbers, and underscores")
     ])
     password = PasswordField('Password', validators=[
         DataRequired(),
-        Length(min=8, message="Password must be at least 8 characters")
+        Length(min=8, max=128),
+        Regexp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+               message="Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
     ])
 
 class LoginForm(FlaskForm):
@@ -79,10 +111,16 @@ def login():
                     form.certificate_pem.data.encode('utf-8'), 
                     default_backend()
                 )
+                stored_cert_pem = user.get_certificate_pem()
                 stored_cert = x509.load_pem_x509_certificate(
-                    user.get_certificate_pem().encode('utf-8'), 
+                    stored_cert_pem.encode('utf-8'), 
                     default_backend()
                 )
+                
+                # Enhanced certificate validation
+                if not verify_certificate(stored_cert, ca.certificate):
+                    flash('Invalid certificate chain!', 'error')
+                    return render_template('login.html', form=form)
                 
                 if provided_cert.public_bytes(serialization.Encoding.PEM) != stored_cert.public_bytes(serialization.Encoding.PEM):
                     flash('Certificate verification failed! Invalid certificate provided.', 'error')
@@ -103,8 +141,15 @@ def login():
 
 @app.route('/recovery_info/<int:user_id>')
 def recovery_info(user_id):
+    if 'user_id' not in session:
+        flash('Please log in first.', 'error')
+        return redirect(url_for('login'))
+    
+    if session['user_id'] != user_id:
+        flash('Access denied: You can only view your own recovery information.', 'error')
+        return redirect(url_for('dashboard'))
+    
     user = User.query.get_or_404(user_id)
-    # Get decrypted values for display
     master_key = user.get_master_key()
     certificate_pem = user.get_certificate_pem()
     return render_template('recovery_info.html', 
@@ -120,23 +165,22 @@ def register():
             flash('Username already exists!', 'error')
             return render_template('register.html', form=form)
         
-        if len(form.username.data) < 5:
-            flash('Username must be at least 5 characters!', 'error')
-            return render_template('register.html', form=form)
-        
-        if len(form.password.data) < 8:
-            flash('Password must be at least 8 characters!', 'error')
-            return render_template('register.html', form=form)
-        
-        user = User(username=form.username.data)  # Username is still plaintext for login
+        user = User(username=form.username.data)
         try:
             user.set_password(form.password.data)
             user.generate_keys_and_cert()
             
             db.session.add(user)
             db.session.commit()
+            
+            master_key = user.get_master_key()
+            certificate_pem = user.get_certificate_pem()
+            
             flash('Registration successful! Keep your master key safe for recovery.', 'success')
-            return redirect(url_for('recovery_info', user_id=user.id))
+            return render_template('recovery_info.html', 
+                                 user=user, 
+                                 master_key=master_key,
+                                 certificate_pem=certificate_pem)
         except ValueError as e:
             flash(str(e), 'error')
             return render_template('register.html', form=form)
@@ -160,12 +204,10 @@ def recover():
             flash('Username not found!', 'error')
             return render_template('recover.html', form=form)
         
-        # Compare with decrypted master key
         if user.get_master_key() != provided_master_key:
             flash('Invalid master key! Please check your recovery information.', 'error')
             return render_template('recover.html', form=form)
         
-        # Generate new keys and cert (encrypted with same salt/username)
         private_key = rsa.generate_private_key(
             public_exponent=65537,
             key_size=2048,
@@ -174,7 +216,6 @@ def recover():
         public_key = private_key.public_key()
         cert = ca.issue_certificate(public_key, user.username)
         
-        # Re-encrypt with same key (same username + salt)
         key = user._get_encryption_key()
         user.encrypted_private_key_pem = encrypt_data(
             private_key.private_bytes(
@@ -198,7 +239,6 @@ def recover():
 
 @app.route('/password_reset', methods=['GET', 'POST'])
 def password_reset():
-    """Password reset using certificate authentication"""
     form = PasswordResetForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -207,16 +247,20 @@ def password_reset():
             flash('Username not found!', 'error')
             return render_template('password_reset.html', form=form)
         
-        # Verify certificate against decrypted certificate
         try:
             provided_cert = x509.load_pem_x509_certificate(
                 form.certificate_pem.data.encode('utf-8'), 
                 default_backend()
             )
+            stored_cert_pem = user.get_certificate_pem()
             stored_cert = x509.load_pem_x509_certificate(
-                user.get_certificate_pem().encode('utf-8'), 
+                stored_cert_pem.encode('utf-8'), 
                 default_backend()
             )
+            
+            if not verify_certificate(stored_cert, ca.certificate):
+                flash('Invalid certificate chain!', 'error')
+                return render_template('password_reset.html', form=form)
             
             if provided_cert.public_bytes(serialization.Encoding.PEM) != stored_cert.public_bytes(serialization.Encoding.PEM):
                 flash('Certificate verification failed! Invalid certificate provided.', 'error')
@@ -226,7 +270,6 @@ def password_reset():
             flash('Invalid certificate format! Please provide a valid PEM certificate.', 'error')
             return render_template('password_reset.html', form=form)
         
-        # Update password (encrypted with same key)
         try:
             user.set_password(form.new_password.data)
             db.session.commit()
@@ -250,7 +293,7 @@ def download_cert(user_id):
 @app.route('/cert/<int:user_id>/download')
 def download_certificate(user_id):
     user = User.query.get_or_404(user_id)
-    cert_bytes = user.get_certificate_pem().encode('utf-8')  # Use decrypted cert
+    cert_bytes = user.get_certificate_pem().encode('utf-8')
     return send_file(
         io.BytesIO(cert_bytes),
         mimetype='application/x-pem-file',
@@ -283,7 +326,6 @@ def dashboard():
 
 @app.route('/fund')
 def fund():
-    """Redirect to Stripe checkout"""
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
@@ -293,11 +335,9 @@ def fund():
         session.clear()
         return redirect(url_for('login'))
     
-    # Store user ID in session for webhook
     session['fund_user_id'] = user.id
     
     try:
-        # Create Stripe checkout session
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=[{
@@ -322,23 +362,19 @@ def fund():
 
 @app.route('/fund/success')
 def fund_success():
-    """Handle successful Stripe payment"""
     session_id = request.args.get('session_id')
     if not session_id:
         flash('Invalid session', 'error')
         return redirect(url_for('dashboard'))
     
     try:
-        # Retrieve the session to get payment details
         checkout_session = stripe.checkout.Session.retrieve(session_id)
         
         if checkout_session.payment_status == 'paid':
-            # Get user ID from session or client_reference_id
             user_id = session.get('fund_user_id') or int(checkout_session.client_reference_id)
             user = User.query.get(user_id)
             
             if user:
-                # Add funds (amount in dollars)
                 amount = checkout_session.amount_total / 100
                 user.balance += amount
                 db.session.commit()
@@ -377,20 +413,24 @@ def transfer():
             flash('Cannot transfer to yourself!', 'error')
             return render_template('transfer.html', form=form)
         
-        if sender.balance < form.amount.data:  
+        if sender.balance < form.amount.data:
             flash('Insufficient funds!', 'error')
             return render_template('transfer.html', form=form)
         
-        # Verify certificate against decrypted certificate
         try:
             provided_cert = x509.load_pem_x509_certificate(
                 form.certificate_pem.data.encode('utf-8'), 
                 default_backend()
             )
+            stored_cert_pem = sender.get_certificate_pem()
             stored_cert = x509.load_pem_x509_certificate(
-                sender.get_certificate_pem().encode('utf-8'), 
+                stored_cert_pem.encode('utf-8'), 
                 default_backend()
             )
+            
+            if not verify_certificate(stored_cert, ca.certificate):
+                flash('Invalid certificate chain!', 'error')
+                return render_template('transfer.html', form=form)
             
             if provided_cert.public_bytes(serialization.Encoding.PEM) != stored_cert.public_bytes(serialization.Encoding.PEM):
                 flash('Certificate verification failed! Invalid certificate provided.', 'error')
@@ -413,7 +453,7 @@ def transfer():
         try:
             db.session.add(tx)
             db.session.commit()
-            flash(f'Transfer of ${form.amount:.2f} to {recipient.username} successful!', 'success')  # ✅ FIXED: Added .data
+            flash(f'Transfer of ${form.amount.data:.2f} to {recipient.username} successful!', 'success')
             return redirect(url_for('dashboard'))
         except Exception as e:
             db.session.rollback()
@@ -425,4 +465,6 @@ def transfer():
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    
+    # Run with HTTPS
+    app.run(debug=True, ssl_context=('cert.pem', 'key.pem'))

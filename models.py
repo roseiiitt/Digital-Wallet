@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography import x509
-from cryptography.x509.oid import NameOID
+from cryptography.x509.oid import NameOID, ExtensionOID
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -82,46 +82,56 @@ def derive_encryption_key(master_password: str, salt: bytes) -> bytes:
     return kdf.derive(master_password.encode())
 
 def encrypt_data(plaintext: str, key: bytes) -> bytes:
-    """Encrypt data with AES-256-GCM"""
+    """Encrypt data with AES-256-GCM → returns bytes"""
     nonce = os.urandom(12)
     cipher = Cipher(algorithms.AES(key), modes.GCM(nonce), backend=default_backend())
     encryptor = cipher.encryptor()
     ciphertext = encryptor.update(plaintext.encode()) + encryptor.finalize()
     return nonce + encryptor.tag + ciphertext
 
-def decrypt_data(encrypted_data: bytes, key: bytes) -> str:
-    """Decrypt data with AES-256-GCM"""
-    nonce = encrypted_data[:12]
-    tag = encrypted_data[12:28]
-    ciphertext = encrypted_data[28:]
+def decrypt_data(encrypted_bytes, key: bytes) -> str:
+    """Decrypt data with AES-256-GCM ← expects bytes"""
+    nonce = encrypted_bytes[:12]
+    tag = encrypted_bytes[12:28]
+    ciphertext = encrypted_bytes[28:]
     cipher = Cipher(algorithms.AES(key), modes.GCM(nonce, tag), backend=default_backend())
     decryptor = cipher.decryptor()
     plaintext = decryptor.update(ciphertext) + decryptor.finalize()
     return plaintext.decode()
 
+def verify_certificate(cert, ca_cert):
+    try:
+        cert.verify_directly_issued_by(ca_cert)
+        current_time = datetime.datetime.utcnow()
+        if not (cert.not_valid_before <= current_time <= cert.not_valid_after):
+            return False
+        try:
+            key_usage = cert.extensions.get_extension_for_oid(ExtensionOID.KEY_USAGE)
+            if not key_usage.value.digital_signature:
+                return False
+        except Exception:
+            return False
+        return True
+    except Exception:
+        return False
+
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
-    # Encrypted fields
+    # 🔑 MUST use LargeBinary for encrypted fields
     encrypted_password_hash = db.Column(db.LargeBinary, nullable=False)
     encrypted_private_key_pem = db.Column(db.LargeBinary, nullable=False)
     encrypted_certificate_pem = db.Column(db.LargeBinary, nullable=False)
     encrypted_master_key = db.Column(db.LargeBinary, nullable=False)
-    # Salt for key derivation
     encryption_salt = db.Column(db.LargeBinary, nullable=False)
-    # Balance remains unencrypted for queries
     balance = db.Column(db.Float, default=0.0)
     
     def __init__(self, username):
         super().__init__()
         self.username = username
-        # Generate unique salt for this user
         self.encryption_salt = os.urandom(16)
     
     def _get_encryption_key(self) -> bytes:
-        """Get encryption key derived from username (in production, use user password)"""
-        # In production, this should be derived from user's password + salt
-        # For demo, we use username as the "master password"
         return derive_encryption_key(self.username, self.encryption_salt)
     
     def set_password(self, password):
@@ -129,6 +139,7 @@ class User(db.Model):
             raise ValueError("Password must be at least 8 characters")
         password_hash = generate_password_hash(password)
         key = self._get_encryption_key()
+      
         self.encrypted_password_hash = encrypt_data(password_hash, key)
     
     def check_password(self, password):
@@ -140,34 +151,28 @@ class User(db.Model):
             return False
     
     def get_private_key_pem(self) -> str:
-        """Get decrypted private key PEM"""
         key = self._get_encryption_key()
         return decrypt_data(self.encrypted_private_key_pem, key)
     
     def get_certificate_pem(self) -> str:
-        """Get decrypted certificate PEM"""
         key = self._get_encryption_key()
         return decrypt_data(self.encrypted_certificate_pem, key)
     
     def get_master_key(self) -> str:
-        """Get decrypted master key"""
         key = self._get_encryption_key()
         return decrypt_data(self.encrypted_master_key, key)
     
     def generate_keys_and_cert(self):
-        # Generate RSA key pair
         private_key = rsa.generate_private_key(
             public_exponent=65537,
             key_size=2048,
             backend=default_backend()
         )
         public_key = private_key.public_key()
-        
-        # Issue certificate
         cert = ca.issue_certificate(public_key, self.username)
-        
-        # Store PEM formats (encrypted)
         key = self._get_encryption_key()
+        
+       
         self.encrypted_private_key_pem = encrypt_data(
             private_key.private_bytes(
                 encoding=serialization.Encoding.PEM,
@@ -176,13 +181,10 @@ class User(db.Model):
             ).decode('utf-8'),
             key
         )
-        
         self.encrypted_certificate_pem = encrypt_data(
             cert.public_bytes(serialization.Encoding.PEM).decode('utf-8'),
             key
         )
-        
-        # Generate and store master key (encrypted)
         master_key = secrets.token_hex(32)
         self.encrypted_master_key = encrypt_data(master_key, key)
 

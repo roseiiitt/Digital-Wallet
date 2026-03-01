@@ -1,6 +1,5 @@
 # Database files
 wallet.db
-instance/wallet.db
 *.db
 *.sqlite
 
@@ -11,7 +10,7 @@ __pycache__/
 *.pyd
 .Python
 
-# Virtual Environment (if you create one)
+# Virtual Environment
 venv/
 ENV/
 .env
@@ -30,9 +29,6 @@ Thumbs.db
 *.pem
 secrets.py
 config.py
-.env
-.env.local
-
 
 # Log files
 *.log
@@ -51,13 +47,3 @@ Thumbs.db
 *~
 *.bak
 *.tmp
-
-# Coverage and test files
-htmlcov/
-.coverage
-.cache
-.pytest_cache/
-.mypy_cache/
-
-# Local configuration
-local_settings.py
